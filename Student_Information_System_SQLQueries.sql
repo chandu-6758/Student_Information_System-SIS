@@ -2,45 +2,45 @@ create database SISDB;
 use SISDB;
 /*Creating Tables*/
 /*1.Students
-• student_id (Primary Key)
-• first_name
-• last_name
-• date_of_birth
-• email
-• phone_number*/
+â€¢ student_id (Primary Key)
+â€¢ first_name
+â€¢ last_name
+â€¢ date_of_birth
+â€¢ email
+â€¢ phone_number*/
 
 create table Students(student_id varchar(5) primary key not null, 
 first_name varchar(30),last_name  varchar(50),
 date_of_Birth date,email varchar(100) not null, phone_number BIGINT);
 /*2. Courses
 
-• course_id (Primary Key)
-• course_name
-• credits
-• teacher_id (Foreign Key)*/
+â€¢ course_id (Primary Key)
+â€¢ course_name
+â€¢ credits
+â€¢ teacher_id (Foreign Key)*/
 
 create table Courses(course_id varchar(5) primary key not null,course_name varchar(10), 
 credits int, teacher_id varchar(5), Foreign key(teacher_id) REFERENCES Teacher(teacher_id));
  /*4.Teacher
-• teacher_id (Primary Key)
-• first_name
-• last_name
-• email*/
+â€¢ teacher_id (Primary Key)
+â€¢ first_name
+â€¢ last_name
+â€¢ email*/
 
 create table Teacher(teacher_id varchar(5) primary key not null, first_name varchar(50),last_name varchar(50),
 email varchar(100));
 /*3. Enrollments
-• enrollment_id (Primary Key)
-• student_id (Foreign Key)
-• course_id (Foreign Key)
-• enrollment_date*/
+â€¢ enrollment_id (Primary Key)
+â€¢ student_id (Foreign Key)
+â€¢ course_id (Foreign Key)
+â€¢ enrollment_date*/
 create table Enrollments(enrollment_id varchar(5) not null primary key,student_id varchar(5), foreign key(student_id) references Students(student_id),
 course_id varchar(5), foreign key(course_id) references Courses(course_id),enrollment_date date);
 /*5 Payments
-• payment_id (Primary Key)
-• student_id (Foreign Key)
-• amount
-• payment_date*/
+â€¢ payment_id (Primary Key)
+â€¢ student_id (Foreign Key)
+â€¢ amount
+â€¢ payment_date*/
 create table Payments(payment_id varchar(5) not null primary key, student_id varchar(5),foreign key(student_id) references Students(student_id),amount int,payment_date date); 
 
 /*4. Create appropriate Primary Key and Foreign Key constraints for referential integrity*/
@@ -232,7 +232,8 @@ enrollment records*/
   Enrollments e on e.course_id=c.course_id where e.enrollment_id IS NULL;
 
 /*9. Identify students who are enrolled in more than one course. Use a self-join on the "Enrollments" 
-table to find students with multiple enrollment records.*/
+table to find students with multiple enrollment records.*/
+
 
 select distinct e1.student_id,s.first_name from Enrollments e1 JOIN Enrollments e2 on
 e1.student_id=e2.student_id and e1.course_id!=e2.course_id JOIN Students s on e1.student_id=s.student_id;
@@ -244,8 +245,8 @@ select t.teacher_id,t.first_name from Teacher t Left join Courses c on t.teacher
 
 ----------Task-4--------------------
 
-/*1. Write an SQL query to calculate the average number of students enrolled in each course. Use 
-aggregate functions and subqueries to achieve this.*/
+/*1. Write an SQL query to calculate the average number of students enrolled in each course. Use aggregate functions and subqueries to achieve this.*/
+
 select c.course_id, c.course_name,AVG(e.student_count) as Average_student_Enrollments from
 Courses c left join (select course_id,COUNT(student_id) as student_count
 from Enrollments Group by course_id) as e on c.course_id=e.course_id group by c.course_id,c.course_name;
@@ -287,8 +288,8 @@ select s.student_id,s.first_name,s.last_name from Students s
 where (select COUNT(distinct course_id) from courses)=(select COUNT(distinct course_id) 
 from Enrollments e where s.student_id=e.student_id);
 
-/*6. Retrieve the names of teachers who have not been assigned to any courses. Use subqueries to 
-find teachers with no course assignments.*/
+/*6. Retrieve the names of teachers who have not been assigned to any courses. Use subqueries to find teachers with no course assignments.*/
+
 select teacher_id, first_name, last_name from Teacher where teacher_id not in (select distinct teacher_id from Courses);
 
 /*7. Calculate the average age of all students. Use subqueries to calculate the age of each student 
@@ -296,8 +297,8 @@ based on their date of birth*/
 
 select AVG(A.age) as avg_age from(select DATEDIFF(YEAR,s.date_of_birth, GETDATE()) as age from Students s) as A;
 
-/*8. Identify courses with no enrollments. Use subqueries to find courses without enrollment 
-records.*/
+/*8. Identify courses with no enrollments. Use subqueries to find courses without enrollment records.*/
+
 select distinct c.course_id ,c.course_name from  Courses c where c.course_id Not in (select distinct course_id from Enrollments);
 
 /*9. Calculate the total payments made by each student for each course they are enrolled in. Use 
@@ -320,15 +321,13 @@ select s.student_id,s.first_name,s.last_name, SUM(p.amount) as total_payments fr
 Join Payments p on s.student_id =p.student_id
 Group by s.student_id,s.first_name,s.last_name;
 
-/*12. Retrieve a list of course names along with the count of students enrolled in each course. Use 
-JOIN operations between the "Courses" table and the "Enrollments" table and GROUP BY to 
-count enrollments.*/
+/*12. Retrieve a list of course names along with the count of students enrolled in each course. Use JOIN operations between the "Courses" table and the "Enrollments" table and GROUP BY to count enrollments.*/
+
 select c.course_name,COUNT(e.student_id) as enrollment_count from Courses c 
  left Join Enrollments e on c.course_id=e.course_id
 Group by c.course_name;
 
-/*13. Calculate the average payment amount made by students. Use JOIN operations between the 
-"Students" table and the "Payments" table and GROUP BY to calculate the average*/
+/*13. Calculate the average payment amount made by students. Use JOIN operations between the "Students" table and the "Payments" table and GROUP BY to calculate the average*/
 
 select AVG(p.amount) as Average_payments from Students s JOIN Payments p on s.student_id=p.student_id;
 
